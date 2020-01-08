@@ -11,13 +11,6 @@ class BooksTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('books')->insert([
-            'title' => str_random(60),
-            'author' => str_random(60),
-            'pages' => rand(1, 1000),
-            'marker' => 1,
-            'user_id' => 1
-
-        ]);        
+        factory(App\Book::class, 10)->create();        
     }
 }

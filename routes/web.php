@@ -14,3 +14,11 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Auth::routes();
+
+Route::get('/home', 'BookShelfController@index')->name('home');
+
+Route::resource('book', 'BookController');
+
+
