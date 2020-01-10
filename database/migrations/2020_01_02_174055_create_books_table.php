@@ -17,13 +17,14 @@ class CreateBooksTable extends Migration
             $table->increments('id');
             $table->string('title', 100);
             $table->string('author', 70);
-            $table->integer('pages');
-            $table->integer('marker');
+            $table->integer('pages')->unsigned();
+            $table->integer('rate')->nullable();
+            $table->integer('marker')->default(1)->unsigned();
             $table->boolean('future_read')->default(false);
             $table->date('planning_date')->nullable();
             $table->date('start_date')->nullable();
             $table->date('finish_date')->nullable();
-            $table->string('cover')->nullable();
+            $table->string('photo_id')->nullable();
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();

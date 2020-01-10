@@ -11,14 +11,14 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
-Auth::routes();
+// Auth::routes();
 
-Route::get('/home', 'BookShelfController@index')->name('home');
+// Route::get('/home', 'BookShelfController@index')->name('home');
 
-Route::resource('book', 'BookController');
+// Route::resource('book', 'BookController');
 
 

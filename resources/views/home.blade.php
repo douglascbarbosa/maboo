@@ -15,7 +15,7 @@
                         <img src="https://images-na.ssl-images-amazon.com/images/I/71Q1Iu4suSL._SY606_.jpg" class="card-img-top" alt="...">
                         <div class="card-body">
                             <h5 class="card-title">{{$book->title}}</h5>
-                            <p class="card-text">{{$book->author}}</p>
+                            <p class="card-text">{{$book->author}}</p>                            
                             <a href="#" class="btn btn-primary">Go somewhere</a>
                         </div>
                     </div>

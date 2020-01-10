@@ -13,9 +13,9 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 // Route::get('books', [ 'as' => 'books', function () {
 //     return App\Book::all();
@@ -25,4 +25,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     return App\User::all();
 // });
 
-Route::resource('user.books', 'BookController', ['only' => ['index', 'store', 'update']]);
+// Route::resource('user.books', 'BookController', ['only' => ['index', 'store', 'update']]);
+
+Route::resource('user.books', 'BookController', ['except' => ['create', 'edit']]);

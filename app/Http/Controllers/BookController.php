@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 use App\User;
 use App\Book; 
+use App\Photo;
 use Illuminate\Http\Request;
+use App\Http\Requests\BooksRequest;
+use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
@@ -39,7 +42,10 @@ class BookController extends Controller
      */
     public function create()
     {
-        return view('book.create');
+
+        $user_id = Auth::user()->id;
+
+        return view('book.create', compact('user_id'));
     }
 
     /**
@@ -48,8 +54,27 @@ class BookController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(BooksRequest $request)
     {
+
+        
+        $input = $request->all();
+
+        if($file = $request->file('photo_id')) {
+            $name = time() . '_' .  $file->getClientOriginalName();
+            
+            $file->move('images', $name);
+
+            $photo = Photo::create(['path' => $name]);
+
+            $input['photo_id'] = $photo->id;
+
+        }
+
+
+        Book::create($input);
+
+        return redirect('/home');
 
 /*        $user = User::findOrFail($userId);
 
@@ -63,7 +88,7 @@ class BookController extends Controller
         return $user->books;
         */
 
-        return $request->all();
+        // return $request->all();
     }
 
     /**
