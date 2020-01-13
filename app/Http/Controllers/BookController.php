@@ -1,57 +1,27 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\User;
-use App\Book; 
-use App\Photo;
-use Illuminate\Http\Request;
+
+use App\Book;
 use App\Http\Requests\BooksRequest;
-// use Illuminate\Support\Facades\Auth;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BookController extends ApiController
 {
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    // public function __construct()
-    // {
-
-    // }
-
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    // public function index($userId)
-    // {
-    //     return Book::ofUser($userId)->paginate();
-    // }
-    public function index() 
+    public function index()
     {
-        // return view('book.index');
-
         $books = Book::all();
-
+        
         return $this->showAll($books);
-
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    // public function create()
-    // {
-
-    //     $user_id = Auth::user()->id;
-
-    //     return view('book.create', compact('user_id'));
-    // }
 
     /**
      * Store a newly created resource in storage.
@@ -62,86 +32,83 @@ class BookController extends ApiController
     public function store(BooksRequest $request, User $user)
     {
 
+        $inputs = $request->all();
+
+        $inputs['user_id'] = $user->id;
         
-        $input = $request->all();
+        if($request->has('cover')) {
+            $inputs['cover'] = $request->cover->store('');
+        }
 
-        return $this->showOne($user);
+        $book = Book::create($inputs);
 
-        // if($file = $request->file('photo_id')) {
-        //     $name = time() . '_' .  $file->getClientOriginalName();
-            
-        //     $file->move('images', $name);
-
-        //     $photo = Photo::create(['path' => $name]);
-
-        //     $input['photo_id'] = $photo->id;
-
-        // }
-
-
-        // $book = Book::create($input);
-
-        // return $this->showOne($book);
-
-        // return redirect('/home');
-
-/*        $user = User::findOrFail($userId);
-
-        $user->books()->save(new Book([
-            'title' => $request->input('title'),
-            'author' => $request->input('author'),
-            'pages' => $request->input('pages'),
-            'marker' => $request->input('marker'),
-        ]));
+        return $this->showOne($book, 201);
         
-        return $user->books;
-        */
-
-        // return $request->all();
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Book  $book
+     * @param  \App\User $user
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $user, Book $book)
     {
-        //
+        return $this->showOne($book);
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    // public function edit($id)
-    // {
-    //     //
-    // }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\User $user
+     * @param  \App\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user, Book $book)
     {
-        //
+        $book->fill($request->only([
+            'title',
+            'author',
+            'pages',
+            'rate',
+            'marker',
+            'planning_date',
+            'start_date',
+            'finish_date',
+            'cover'
+        ]));
+
+
+        if($request->has('cover')) {
+            Storage::delete($book->cover);
+            
+            $book->cover = $request->cover->store('');
+        }
+
+        if($book->isClean()) {
+            return $this->errorResponse('You need to specify any different value to update', 422);
+        }
+
+        $book->save();
+
+        return $this->showOne($book);
+
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\User $user
+     * @param  \App\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(User $user, Book $book)
     {
-        //
+        Storage::delete($book->cover);
+        $book->delete();
+
+        return $this->showOne($book);
     }
 }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Book extends Model
 {
 
-    public $fillable = ['title', 'author', 'rate', 'pages', 'marker', 'future_read', 'planning_date', 'start_date', 'finish_date', 'photo_id', 'user_id'];
+    public $fillable = ['title', 'author', 'rate', 'pages', 'marker', 'future_read', 'planning_date', 'start_date', 'finish_date', 'cover', 'user_id'];
 
     public function user()
     {

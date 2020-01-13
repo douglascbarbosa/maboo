@@ -26,7 +26,7 @@ class BooksRequest extends FormRequest
         return [
             'title' => 'required',
             'author' => 'required',
-            'pages' => 'required'            
+            'pages' => 'required'
         ];
     }
 }
