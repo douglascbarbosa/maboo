@@ -4,10 +4,10 @@ use Faker\Generator as Faker;
 
 $factory->define(App\Book::class, function (Faker $faker) {
     return [
-        'title' => $faker->text($maxNbChars = 100),
+        'title' => $faker->catchPhrase,
         'author' => $faker->name,
-        'pages' => 1,
-        'marker' => 1,
-        'user_id' => 1
+        'pages' => rand( 10, 1000 ),        
+        'marker' => rand( 10, 10000 ),
+        'user_id' => App\User::all()->random()->id
     ];
 });

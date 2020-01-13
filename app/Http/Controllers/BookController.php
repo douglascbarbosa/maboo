@@ -6,9 +6,9 @@ use App\Book;
 use App\Photo;
 use Illuminate\Http\Request;
 use App\Http\Requests\BooksRequest;
-use Illuminate\Support\Facades\Auth;
+// use Illuminate\Support\Facades\Auth;
 
-class BookController extends Controller
+class BookController extends ApiController
 {
 
     /**
@@ -16,10 +16,10 @@ class BookController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+    // public function __construct()
+    // {
+
+    // }
 
     /**
      * Display a listing of the resource.
@@ -32,7 +32,12 @@ class BookController extends Controller
     // }
     public function index() 
     {
-        return view('book.index');
+        // return view('book.index');
+
+        $books = Book::all();
+
+        return $this->showAll($books);
+
     }
 
     /**
@@ -40,13 +45,13 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+    // public function create()
+    // {
 
-        $user_id = Auth::user()->id;
+    //     $user_id = Auth::user()->id;
 
-        return view('book.create', compact('user_id'));
-    }
+    //     return view('book.create', compact('user_id'));
+    // }
 
     /**
      * Store a newly created resource in storage.
@@ -54,27 +59,31 @@ class BookController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(BooksRequest $request)
+    public function store(BooksRequest $request, User $user)
     {
 
         
         $input = $request->all();
 
-        if($file = $request->file('photo_id')) {
-            $name = time() . '_' .  $file->getClientOriginalName();
+        return $this->showOne($user);
+
+        // if($file = $request->file('photo_id')) {
+        //     $name = time() . '_' .  $file->getClientOriginalName();
             
-            $file->move('images', $name);
+        //     $file->move('images', $name);
 
-            $photo = Photo::create(['path' => $name]);
+        //     $photo = Photo::create(['path' => $name]);
 
-            $input['photo_id'] = $photo->id;
+        //     $input['photo_id'] = $photo->id;
 
-        }
+        // }
 
 
-        Book::create($input);
+        // $book = Book::create($input);
 
-        return redirect('/home');
+        // return $this->showOne($book);
+
+        // return redirect('/home');
 
 /*        $user = User::findOrFail($userId);
 
@@ -108,10 +117,10 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
-        //
-    }
+    // public function edit($id)
+    // {
+    //     //
+    // }
 
     /**
      * Update the specified resource in storage.

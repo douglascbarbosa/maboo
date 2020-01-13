@@ -24,8 +24,4 @@ class Book extends Model
         return $query->where('user_id', $userId);
     }
 
-    public function photo()
-    {
-        return $this->belongsTo(App\Photo::class);
-    }
 }

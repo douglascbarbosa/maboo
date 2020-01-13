@@ -27,4 +27,6 @@ use Illuminate\Http\Request;
 
 // Route::resource('user.books', 'BookController', ['only' => ['index', 'store', 'update']]);
 
+Route::resource('user', 'UserController', ['except' => ['create', 'edit']]);
+
 Route::resource('user.books', 'BookController', ['except' => ['create', 'edit']]);
