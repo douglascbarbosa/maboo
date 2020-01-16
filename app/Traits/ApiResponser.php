@@ -3,7 +3,11 @@
 namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Validator;
 
 trait ApiResponser
 {
@@ -26,12 +30,15 @@ trait ApiResponser
         $transformer = $transformer = $collection->first()->transformer;
         $collection = $this->filterData($collection, $transformer);
         $collection = $this->sortData($collection, $transformer);
+        $collection = $this->paginate($collection);
 
         if($transformer) {
-            return $this->successResponse($this->transformData($collection, $transformer), $code);    
-        } else {
-            return $this->successResponse(['data' => $collection], $code);
+            $collection = $this->transformData($collection, $transformer);
         }
+
+        $this->cacheResponse($collection);
+
+        return $this->successResponse(['data' => $collection], $code);
          
     }
 
@@ -67,11 +74,12 @@ trait ApiResponser
 
     protected function filterData(Collection $collection, $transformer)
     {
+        $instance = $collection->first();
 
         foreach(request()->query() as $query => $value) {
             $attribute = $transformer ? $transformer::originalAttribute($query) : $query;
 
-            if(isset($attribute, $value)) {
+            if(isset($attribute, $value) && Schema::hasColumn($instance->getTable(), $attribute)) {
                 $collection = $collection->where($attribute, $value);
             }
         }
@@ -79,5 +87,44 @@ trait ApiResponser
         return $collection;
 
     } 
+
+    protected function paginate(Collection $collection)
+    {
+        $rules = [
+            'per_page' => 'integer|min:2|max:50'
+        ];
+
+        Validator::validate(request()->all(), $rules);
+
+        $page = LengthAwarePaginator::resolveCurrentPage();
+
+        $perPage = request()->has('per_page') ? (int)request()->per_page : 15;
+
+        $results = $collection->slice(($page -1) * $perPage, $perPage)->values();
+
+        $paginated = new LengthAwarePaginator($results, $collection->count(), $perPage, $page, [
+            'path' => LengthAwarePaginator::resolveCurrentPath()
+        ]);
+
+        $paginated->appends(request()->all());
+
+        return $paginated;
+    }
+
+    protected function cacheResponse($data)
+    {
+        $url = request()->url();
+        $queryParams = request()->query();
+
+        ksort($queryParams);
+
+        $queryString = http_build_query($queryParams);
+
+        $url = "{$url}?{$queryString}";
+
+        return Cache::remember($url, 30/60, function() use($data) {
+            return $data;
+        });
+    }
 }
 
