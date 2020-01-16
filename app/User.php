@@ -2,12 +2,15 @@
 
 namespace App;
 
+use App\Transformers\UserTransformer;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
     use Notifiable;
+
+    public $transformer = UserTransformer::class;
 
     /**
      * The attributes that are mass assignable.
