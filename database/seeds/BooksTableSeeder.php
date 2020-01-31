@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use App\Book;
 
 class BooksTableSeeder extends Seeder
 {
@@ -12,6 +13,6 @@ class BooksTableSeeder extends Seeder
     public function run()
     {
         Book::flushEventListeners();
-        factory(App\Book::class, 100)->create();        
+        factory(Book::class, 100)->create();        
     }
 }

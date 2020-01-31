@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="container">
-    <a href="{{ route('book.create') }}" class="btn btn-primary">New Book</a>
+ <!--   <a href="" class="btn btn-primary">New Book</a>
     <div class="row">
 
         @if ($books)
@@ -24,10 +24,10 @@
             @endforeach
 
         @endif
-    </div>
+    </div> -->
 
 
-<!--    <div class="row justify-content-center">
+    <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">Dashboard</div>
@@ -43,6 +43,6 @@
                 </div>
             </div>
         </div>
-    </div> -->
+    </div> 
 </div>
 @endsection

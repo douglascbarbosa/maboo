@@ -28,6 +28,8 @@ $this->post('password/reset', 'Auth\ResetPasswordController@reset');
 
 Route::get('/home', 'BookShelfController@index')->name('home');
 
+Route::get('/home/my-tokens', 'BookShelfController@getTokens')->name('personal-tokens');
+
 // Route::resource('book', 'BookController');
 
 
