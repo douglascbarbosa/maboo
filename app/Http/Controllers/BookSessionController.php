@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Book;
+use App\Http\Requests\BookSessionRequest;
 use Illuminate\Http\Request;
 
 class BookSessionController extends ApiController
@@ -32,9 +34,9 @@ class BookSessionController extends ApiController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(BookSessionRequest $request, Book $book)
     {
-        //
+        
     }
 
     /**
