@@ -25,6 +25,8 @@ class UserController extends ApiController
      */
     public function index()
     {
+        $this->allowedAdminAction();
+
         $users = User::all();
 
         return $this->showAll($users);

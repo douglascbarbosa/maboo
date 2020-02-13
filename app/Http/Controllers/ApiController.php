@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Traits\ApiResponser;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Access\Gate;
 use Illuminate\Http\Request;
 
 class ApiController extends Controller
@@ -12,5 +14,12 @@ class ApiController extends Controller
     public function __construct()
     {
         
+    }
+
+    protected function allowedAdminAction()
+    {
+        if(Gate::denies('admin-action')) {
+            throw new AuthorizationException('This action is unauthorized');
+        }
     }
 }

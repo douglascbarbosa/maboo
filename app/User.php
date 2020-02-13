@@ -11,6 +11,9 @@ class User extends Authenticatable
 {
     use Notifiable, HasApiTokens;
 
+    const ADMIN_USER_TYPE = 'A';
+    const READER_USER_TYPE = 'R';
+
     public $transformer = UserTransformer::class;
 
     /**
@@ -30,6 +33,11 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function isAdmin()
+    {
+        return $this->type === self::ADMIN_USER_TYPE;
+    }
 
     public function books() 
     {

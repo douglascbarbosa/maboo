@@ -14,6 +14,7 @@ class BookController extends ApiController
     public function __construct()
     {
         // $this->middleware('client.credentials');
+        $this->middleware('can:view,book')->only('view');
     }
 
     /**
