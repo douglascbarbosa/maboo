@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Book;
+use App\BookSession;
 use App\Http\Requests\BookSessionRequest;
 use Illuminate\Http\Request;
 
@@ -36,7 +37,17 @@ class BookSessionController extends ApiController
      */
     public function store(BookSessionRequest $request, Book $book)
     {
+        $inputs = $request->all();
+
+        # creating the session
+        $bookSession = BookSession::create($inputs);
         
+        # changing the book marker to the current page
+        $book = $bookSession->book;
+        $book->marker = $book->marker + $bookSession->read_pages; 
+
+        # return the saved page
+        return $this->showOne($bookSession, 201);
     }
 
     /**

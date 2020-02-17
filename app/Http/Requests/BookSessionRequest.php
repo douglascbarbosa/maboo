@@ -26,7 +26,7 @@ class BookSessionRequest extends FormRequest
         return [
             'read_pages'=> 'required',
             'time'=> 'required',
-            'date'=> 'required',
+            'date'=> 'required|date',
             'book_id' => 'required'
         ];
     }
