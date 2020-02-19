@@ -16,5 +16,11 @@ class BookSession extends Model
     public function book() 
     {
        return $this->belongsTo(Book::class);
-    }    
+    }   
+    
+    public function scopeOfBook($query, $bookId)
+    {
+        return $query->where('book_id', $bookId);
+    }
+    
 }

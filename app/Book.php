@@ -24,4 +24,14 @@ class Book extends Model
         return $query->where('user_id', $userId);
     }
 
+    public function addPages($pages)
+    {
+        $this->update(['marker' => $this->marker + $pages]);
+    }
+
+    public function subPages($pages)
+    {
+        $this->update(['marker' => $this->marker - $pages]);
+    }
+
 }

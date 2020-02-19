@@ -14,19 +14,9 @@ class BookSessionController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Book $book)
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return $this->showAll($book->bookSessions);
     }
 
     /**
@@ -43,8 +33,9 @@ class BookSessionController extends ApiController
         $bookSession = BookSession::create($inputs);
         
         # changing the book marker to the current page
-        $book = $bookSession->book;
-        $book->marker = $book->marker + $bookSession->read_pages; 
+        // $book = $bookSession->book;
+        // $book->marker = $book->marker + $bookSession->read_pages;
+        $book->addPages($bookSession->read_pages); 
 
         # return the saved page
         return $this->showOne($bookSession, 201);
@@ -56,20 +47,10 @@ class BookSessionController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Book $book, $id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        $bookSession = $this->findModelItem($book->bookSessions(), $id);
+        return $this->showOne($bookSession);        
     }
 
     /**
@@ -79,9 +60,30 @@ class BookSessionController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Book $book, $id)
     {
-        //
+        $bookSession = $this->findModelItem($book->bookSessions(), $id);
+
+        $diffPages = $bookSession->read_pages - $request->read_pages; 
+
+        $bookSession->fill($request->only([
+            'read_pages',
+            'time',
+            'date',                
+        ]));
+
+        if($bookSession->isClean()) {
+            return $this->errorResponse('You need to specify any different value to update', 422);
+        }
+
+        $bookSession->save();
+        
+        if ($diffPages > 0) {
+            $book->addPages($diffPages);
+        }
+
+        return $this->showOne($bookSession);
+
     }
 
     /**

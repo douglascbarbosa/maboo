@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Book;
 use App\Http\Requests\BooksRequest;
 use App\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -21,11 +22,9 @@ class BookController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(User $user)
     {
-        $books = Book::all();
-        
-        return $this->showAll($books);
+        return $this->showAll($user->books);
     }
 
 
@@ -59,8 +58,9 @@ class BookController extends ApiController
      * @param  \App\User $user
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user, Book $book)
+    public function show(User $user, $id)
     {
+        $book = $this->findModelItem($user->books(), $id);
         return $this->showOne($book);
     }
 
