@@ -33,8 +33,6 @@ class BookSessionController extends ApiController
         $bookSession = BookSession::create($inputs);
         
         # changing the book marker to the current page
-        // $book = $bookSession->book;
-        // $book->marker = $book->marker + $bookSession->read_pages;
         $book->addPages($bookSession->read_pages); 
 
         # return the saved page
@@ -92,8 +90,14 @@ class BookSessionController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Book $book, $id)
     {
-        //
+        $bookSession = $this->findModelItem($book->bookSessions(), $id);
+        $bookSession->delete();
+
+        $book->subPages($bookSession->read_pages);
+
+        return $this->showOne($bookSession);
+        
     }
 }

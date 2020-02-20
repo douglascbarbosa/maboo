@@ -110,8 +110,10 @@ class BookController extends ApiController
      * @param  \App\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user, Book $book)
+    public function destroy(User $user, $id)
     {
+        $book = $this->findModelItem($user->books(), $id);
+        
         Storage::delete($book->cover);
         $book->delete();
 
