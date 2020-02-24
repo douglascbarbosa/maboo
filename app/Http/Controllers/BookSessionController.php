@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Book;
+use App\BookSession;
+use App\Http\Requests\BookSessionRequest;
 use Illuminate\Http\Request;
 
 class BookSessionController extends ApiController
@@ -11,19 +14,9 @@ class BookSessionController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Book $book)
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return $this->showAll($book->bookSessions);
     }
 
     /**
@@ -32,9 +25,18 @@ class BookSessionController extends ApiController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(BookSessionRequest $request, Book $book)
     {
-        //
+        $inputs = $request->all();
+
+        # creating the session
+        $bookSession = BookSession::create($inputs);
+        
+        # changing the book marker to the current page
+        $book->addPages($bookSession->read_pages); 
+
+        # return the saved page
+        return $this->showOne($bookSession, 201);
     }
 
     /**
@@ -43,20 +45,10 @@ class BookSessionController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Book $book, $id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        $bookSession = $this->findModelItem($book->bookSessions(), $id);
+        return $this->showOne($bookSession);        
     }
 
     /**
@@ -66,9 +58,30 @@ class BookSessionController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Book $book, $id)
     {
-        //
+        $bookSession = $this->findModelItem($book->bookSessions(), $id);
+
+        $diffPages = $bookSession->read_pages - $request->read_pages; 
+
+        $bookSession->fill($request->only([
+            'read_pages',
+            'time',
+            'date',                
+        ]));
+
+        if($bookSession->isClean()) {
+            return $this->errorResponse('You need to specify any different value to update', 422);
+        }
+
+        $bookSession->save();
+        
+        if ($diffPages > 0) {
+            $book->addPages($diffPages);
+        }
+
+        return $this->showOne($bookSession);
+
     }
 
     /**
@@ -77,8 +90,14 @@ class BookSessionController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Book $book, $id)
     {
-        //
+        $bookSession = $this->findModelItem($book->bookSessions(), $id);
+        $bookSession->delete();
+
+        $book->subPages($bookSession->read_pages);
+
+        return $this->showOne($bookSession);
+        
     }
 }
