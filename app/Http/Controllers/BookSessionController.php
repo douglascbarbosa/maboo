@@ -9,6 +9,13 @@ use Illuminate\Http\Request;
 
 class BookSessionController extends ApiController
 {
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middleware('can:view,book')->only('view');
+    }
+
     /**
      * Display a listing of the resource.
      *

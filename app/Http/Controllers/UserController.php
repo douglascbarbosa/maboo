@@ -14,7 +14,8 @@ class UserController extends ApiController
     {
         // parent::__construct();
 
-        $this->middleware('client.credentials')->only(['index', 'show', 'update', 'destroy']);        
+        $this->middleware('client.credentials')->only(['store']);
+        $this->middleware('auth:api')->except(['store']);      
         $this->middleware('transform.input:' . UserTransformer::class)->only(['store', 'update']);
     }
 
