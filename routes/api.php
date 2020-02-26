@@ -34,3 +34,5 @@ Route::resource('user.books', 'BookController', ['except' => ['create', 'edit']]
 Route::resource('book.sessions', 'BookSessionController', ['except' => ['create', 'edit']]);
 
 Route::post('oauth/token', '\Laravel\Passport\Http\Controllers\AccessTokenController@issueToken');
+
+Route::post('login', 'Auth\LoginController@login');

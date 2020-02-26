@@ -21,9 +21,9 @@ class ApiController extends Controller
 
     protected function allowedAdminAction()
     {
-        if(Gate::denies('admin-action')) {
-            throw new AuthorizationException('This action is unauthorized');
-        }
+        // if(Gate::denies('admin-action')) {
+        //     throw new AuthorizationException('This action is unauthorized');
+        // }
     }
     protected function findModelItem(HasMany $collection, $value): Model
     {
