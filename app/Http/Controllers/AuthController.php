@@ -10,7 +10,6 @@ class AuthController extends ApiController
 {
     public function __construct()
     {
-
     }
 
     public function login(Request $request)
@@ -33,18 +32,50 @@ class AuthController extends ApiController
         ];
 
         $requestToken = Request::create('/oauth/token', 'POST', $data);
+
+        $content = json_decode(app()->handle($requestToken)->getContent());
+
+
+
+        if (!isset($content->access_token)) {
+            return $this->errorResponse($content->message, 401);
+        }
+
+        return $this->showData([
+            'token' => $content->access_token,
+            'refresh_token' => $content->refresh_token
+        ]);
+    }
+
+    public function refresh(Request $request)
+    {
+        $this->validate($request, [
+            'token' => 'required|string',
+        ]);
+
+        $client = DB::table('oauth_clients')
+            ->where('password_client', true)
+            ->first();
+
+        $data = [
+            'grant_type' => 'refresh_token',
+            'client_id' => $client->id,
+            'client_secret' => $client->secret,
+            'refresh_token' => $request->token,
+        ];
+
+        $requestToken = Request::create('/oauth/token', 'POST', $data);
         $content = json_decode(app()->handle($requestToken)->getContent());
 
         if (!isset($content->access_token)) {
-            return $this->errorResponse($content->message, 401);    
+            return $this->errorResponse($content->message, 401);
         }
 
-        $user = User::where('email', $request->email)->first();
-
         return $this->showData([
-            'user' => $user,
             'token' => $content->access_token,
             'refresh_token' => $content->refresh_token
-        ]);   
-    }       
+        ]);
+    }
+
+
 }
