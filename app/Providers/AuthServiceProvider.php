@@ -38,10 +38,9 @@ class AuthServiceProvider extends ServiceProvider
         Passport::refreshTokensExpireIn(Carbon::now()->addDays(30));
         Passport::enableImplicitGrant();
 
-        // Passport::tokensCan([
-        //     'manage-users' => 'Create, read, update and delete users (CRUD)',
-        //     'manage-account' => 'Read your account data, id, name, email',
-        //     'read-general' => 'Read general information'
-        // ]);
+         Passport::tokensCan([
+             'manage-users' => 'Create, read, update and delete users (CRUD)',
+             'track-books' => 'Create, read, update and delete books and book sessions (CRUD). Read statistical information'
+         ]);
     }
 }

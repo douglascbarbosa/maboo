@@ -2,51 +2,61 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
+use App\Traits\ApiResponser;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 
-class AuthController extends ApiController
+/**
+ * Class AuthController
+ * @package App\Http\Controllers
+ */
+class AuthController extends Controller
 {
-    public function __construct()
-    {
-    }
+    use AuthenticatesUsers, ApiResponser;
 
-    public function login(Request $request)
+    /**
+     * @inheritDoc
+     */
+    protected function authenticated(Request $request, $user)
     {
-        $this->validate($request, [
-            'email' => 'required|string',
-            'password' => 'required|string'
-        ]);
+        if ($user->isAdmin()) {
+            $request->request->add([
+                'scope' => 'manage-users'
+            ]);
+        } else {
+            $request->request->add([
+                'scope' => 'track-books'
+            ]);
+        }
 
         $client = DB::table('oauth_clients')
         ->where('password_client', true)
         ->first();
 
-        $data = [
+        $request->request->add([
             'grant_type' => 'password',
             'client_id' => $client->id,
             'client_secret' => $client->secret,
-            'username' => $request->email,
-            'password' => $request->password
-        ];
-
-        $requestToken = Request::create('/oauth/token', 'POST', $data);
-
-        $content = json_decode(app()->handle($requestToken)->getContent());
-
-
-
-        if (!isset($content->access_token)) {
-            return $this->errorResponse($content->message, 401);
-        }
-
-        return $this->showData([
-            'token' => $content->access_token,
-            'refresh_token' => $content->refresh_token
+            'username' => $request->request->get('email')
         ]);
+
+        // forward the request to the oauth token request endpoint
+        $tokenRequest = Request::create(
+            '/oauth/token',
+            'post',
+            (array)$request->request
+        );
+
+        return Route::dispatch($tokenRequest);
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     * @throws \Exception
+     */
     public function refresh(Request $request)
     {
         $this->validate($request, [
