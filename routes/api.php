@@ -29,7 +29,7 @@ use Illuminate\Http\Request;
 
 Route::resource('user', 'UserController', ['except' => ['create', 'edit']]);
 
-Route::resource('user.books', 'BookController', ['except' => ['create', 'edit']]);
+Route::resource('books', 'BookController', ['except' => ['create', 'edit']]);
 
 Route::resource('book.sessions', 'BookSessionController', ['except' => ['create', 'edit']]);
 

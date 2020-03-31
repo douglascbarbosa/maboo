@@ -21,15 +21,15 @@ class AuthController extends Controller
      */
     protected function authenticated(Request $request, $user)
     {
-        if ($user->isAdmin()) {
-            $request->request->add([
-                'scope' => 'manage-users'
-            ]);
-        } else {
-            $request->request->add([
-                'scope' => 'track-books'
-            ]);
-        }
+//        if ($user->isAdmin()) {
+//            $request->request->add([
+//                'scope' => 'manage-users'
+//            ]);
+//        } else {
+//            $request->request->add([
+//                'scope' => 'track-books'
+//            ]);
+//        }
 
         $client = DB::table('oauth_clients')
         ->where('password_client', true)
