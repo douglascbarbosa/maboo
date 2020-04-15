@@ -19,12 +19,6 @@ class ApiController extends Controller
         $this->middleware('auth:api');
     }
 
-    protected function allowedAdminAction()
-    {
-        // if(Gate::denies('admin-action')) {
-        //     throw new AuthorizationException('This action is unauthorized');
-        // }
-    }
     protected function findModelItem(HasMany $collection, $value): Model
     {
 
@@ -39,5 +33,5 @@ class ApiController extends Controller
         return $instance;
 
     }
- 
+
 }

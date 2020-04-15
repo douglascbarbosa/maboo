@@ -5,6 +5,10 @@ namespace App\Policies;
 use App\User;
 use App\Book;
 
+/**
+ * Class BookPolicy
+ * @package App\Policies
+ */
 class BookPolicy
 {
 
@@ -40,6 +44,18 @@ class BookPolicy
      * @return bool
      */
     public function delete(User $user, Book $book)
+    {
+        return $user->id === $book->user_id;
+    }
+
+    /**
+     * Determine whether the user can create a book session.
+     *
+     * @param User $user
+     * @param Book $book
+     * @return bool
+     */
+    public function createSession(User $user, Book $book)
     {
         return $user->id === $book->user_id;
     }

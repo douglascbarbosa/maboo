@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Transformers\UserTransformer;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\User;
 
@@ -15,14 +16,14 @@ class UserController extends ApiController
         // parent::__construct();
 
         $this->middleware('client.credentials')->only(['store']);
-        $this->middleware('auth:api')->except(['store']);      
+        $this->middleware('auth:api')->except(['store']);
         $this->middleware('transform.input:' . UserTransformer::class)->only(['store', 'update']);
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function index()
     {
@@ -36,25 +37,25 @@ class UserController extends ApiController
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param UserRequest $request
+     * @return JsonResponse
      */
     public function store(UserRequest $request)
     {
-                
+
         $data = $request->all();
         $data['password'] = bcrypt($request->password);
 
         $user = User::create($data);
-        
+
         return $this->showOne($user, 201);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  User  $user
+     * @return JsonResponse
      */
     public function show(User $user)
     {
@@ -64,9 +65,9 @@ class UserController extends ApiController
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @param  User $user
+     * @return JsonResponse
      */
     public function update(Request $request, User $user)
     {
@@ -92,12 +93,12 @@ class UserController extends ApiController
             $user->password = bcrypt($request->password);
         }
 
-        if(!$user->isDirty()) 
+        if(!$user->isDirty())
         {
             return $this->errorResponse('You need to specify a different value to update ', 422);
         }
 
-        $user->save();        
+        $user->save();
 
         return $this->showOne($user);
 
@@ -106,8 +107,9 @@ class UserController extends ApiController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param User $user
+     * @return JsonResponse
+     * @throws \Exception
      */
     public function destroy(User $user)
     {
