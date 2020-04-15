@@ -51,6 +51,11 @@ trait ApiResponser
         }
     }
 
+    protected function showData($data, $code = 200)
+    {
+        return $this->successResponse(['data' => $data], $code);
+    }
+
     protected function showMessage($message, $code = 200) 
     {
         return $this->successResponse(['data' => $message], $code);

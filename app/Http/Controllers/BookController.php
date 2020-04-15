@@ -6,7 +6,10 @@ use App\Book;
 use App\Http\Requests\BooksRequest;
 use App\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class BookController extends ApiController
@@ -14,16 +17,21 @@ class BookController extends ApiController
 
     public function __construct()
     {
-        // $this->middleware('client.credentials');
+        parent::__construct();
+
+        $this->middleware('can:view,book')->only('show');
+        $this->middleware('can:update,book')->only('update');
+        $this->middleware('can:delete,book')->only('destroy');
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function index(User $user)
+    public function index()
     {
+        $user = Auth::user();
         return $this->showAll($user->books);
     }
 
@@ -31,16 +39,16 @@ class BookController extends ApiController
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  BooksRequest $request
+     * @return JsonResponse
      */
-    public function store(BooksRequest $request, User $user)
+    public function store(BooksRequest $request)
     {
 
         $inputs = $request->all();
 
-        $inputs['user_id'] = $user->id;
-        
+        $inputs['user_id'] = Auth::id();
+
         if($request->has('cover')) {
             $inputs['cover'] = $request->cover->store('');
         }
@@ -48,31 +56,28 @@ class BookController extends ApiController
         $book = Book::create($inputs);
 
         return $this->showOne($book, 201);
-        
+
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Book  $book
-     * @param  \App\User $user
-     * @return \Illuminate\Http\Response
+     * @param Book $book
+     * @return JsonResponse
      */
-    public function show(User $user, $id)
+    public function show(Book $book)
     {
-        $book = $this->findModelItem($user->books(), $id);
         return $this->showOne($book);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\User $user
-     * @param  \App\Book  $book
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @param  Book  $book
+     * @return JsonResponse
      */
-    public function update(Request $request, User $user, Book $book)
+    public function update(Request $request, Book $book)
     {
         $book->fill($request->only([
             'title',
@@ -89,7 +94,7 @@ class BookController extends ApiController
 
         if($request->has('cover')) {
             Storage::delete($book->cover);
-            
+
             $book->cover = $request->cover->store('');
         }
 
@@ -106,14 +111,15 @@ class BookController extends ApiController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\User $user
-     * @param  \App\Book  $book
-     * @return \Illuminate\Http\Response
+     * @param User $user
+     * @param $id
+     * @return JsonResponse
+     * @throws \Exception
      */
     public function destroy(User $user, $id)
     {
         $book = $this->findModelItem($user->books(), $id);
-        
+
         Storage::delete($book->cover);
         $book->delete();
 

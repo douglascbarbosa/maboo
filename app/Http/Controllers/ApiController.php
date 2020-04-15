@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Traits\ApiResponser;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,7 +16,7 @@ class ApiController extends Controller
 
     public function __construct()
     {
-        
+        $this->middleware('auth:api');
     }
 
     protected function findModelItem(HasMany $collection, $value): Model
@@ -31,5 +33,5 @@ class ApiController extends Controller
         return $instance;
 
     }
- 
+
 }

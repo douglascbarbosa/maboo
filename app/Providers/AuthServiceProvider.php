@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Book;
+use App\Policies\BookPolicy;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -15,7 +17,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        'App\Model' => 'App\Policies\ModelPolicy',
+       Book::class => BookPolicy::class,
     ];
 
     /**
@@ -27,15 +29,18 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
+        Gate::define('admin-action', function($user) {
+            return $user->isAdmin();
+        });
+
         Passport::routes();
         Passport::tokensExpireIn(Carbon::now()->addMinutes(30));
         Passport::refreshTokensExpireIn(Carbon::now()->addDays(30));
         Passport::enableImplicitGrant();
 
-        // Passport::tokensCan([
-        //     'manage-users' => 'Create, read, update and delete users (CRUD)',
-        //     'manage-account' => 'Read your account data, id, name, email',
-        //     'read-general' => 'Read general information'
-        // ]);
+//         Passport::tokensCan([
+//             'manage-users' => 'Create, read, update and delete users (CRUD)',
+//             'track-books' => 'Create, read, update and delete books and book sessions (CRUD). Read statistical information'
+//         ]);
     }
 }
